@@ -7,6 +7,8 @@
 
       var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 
+      var x = new Date();
+
       /**
        * Check if current user has authorized this application.
        */
@@ -65,12 +67,59 @@
       function listUpcomingEvents() {
         var request = gapi.client.calendar.events.list({
           'calendarId': 'primary',
-          'timeMin': (new Date()).toISOString(),
+          var today = new Date(); // today's date
+          var start = new Date(); // start of the week
+          var day = today.getDay();
+
+          var mdays = {
+              0: 31,
+              1: 28,
+              2: 31,
+              3: 30,
+              4: 31,
+              5: 30,
+              6: 31,
+              7: 31,
+              8: 30,
+              9: 31,
+              10: 30,
+              11: 31
+          };
+          var months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+          var date = today.getDate();
+          var cDay = today.getDate() - day;
+          var month = today.getMonth();
+          var year = today.getFullYear();
+          if (cDay <= 0) {
+              var month = month - 1;
+              if (today.getMonth() == 0) {
+                  month = 11;
+                  year = year - 1;
+              }
+              var lastmdays = mdays[lastMonth];
+              cDay = lastmdays - day + 1;
+          }
+
+          start.setDate(cDay);
+          start.setMonth(month);
+          start.setYear(year);
+          'timeMin': start.toISOString(),
+          'timeMax': today.toISOString(),
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 10,
           'orderBy': 'startTime'
         });
+    // function listUpcomingEvents() {
+    //     var request = gapi.client.calendar.events.list({
+    //       'calendarId': 'primary',
+    //       'timeMin': (new Date()).toISOString(),
+    //       'showDeleted': false,
+    //       'singleEvents': true,
+    //       'maxResults': 10,
+    //       'orderBy': 'startTime'
+    //     });
 
         request.execute(function(resp) {
           var events = resp.items;
@@ -104,6 +153,8 @@
         pre.appendChild(textContent);
       }
 
+      x = start.toISOString();
+
     </script>
     <script src="https://apis.google.com/js/client.js?onload=checkAuth">
     </script>
@@ -116,6 +167,9 @@
         Authorize
       </button>
     </div>
+    <script>
+        window.alert(start);
+    </script>
     <pre id="output"></pre>
   </body>
 </html>
